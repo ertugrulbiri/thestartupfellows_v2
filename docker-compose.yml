@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+
+  thestartupfellows_b:
+    image: thestartupfellows/thestartupfellows:v0
+    build: .
+    volumes:
+      - ./:/thestartupfellows
+    ports:
+      - "5002:5000"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:12
+    volumes:
+      - db:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRES_DB: ${POSTGRESQL_DB_NAME}
+    ports:
+      - "5432:5432"
+    restart: always
+
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+volumes:
+  db:
