@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from flask import request, make_response
@@ -35,7 +36,10 @@ def request_login_otp():
         keyword = "telephone"
     # Accepts both email and phone number as login username
     user = user_service.login_service(auth.username, auth.password, keyword)
-    token = generate_jwt_token(user.id, 100000)
+    if not user:
+        return bad_request("Auth Failed", 401)
+    expire_time = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=300)
+    token = generate_jwt_token(user.id, expire_time)
     result = {'id': user.id, 'token': token}
     if result:
         print("giriş yapıldı")

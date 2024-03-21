@@ -16,12 +16,12 @@ def register_startup():
 
 @bp.route('/startups/getInfo', methods=['POST'])
 @token_required_v2
-def get_startup_info():
+def get_startup_info(user):
     """
     Send otp for registration of Client to given phone number
     :return: message in Response
     """
-    return startup_controller.register_startup_controller(request)
+    return startup_controller.get_info_of_start_up_controller(user, request)
 
 
 @bp.route('/startups/applyProgram', methods=['POST'])
@@ -66,6 +66,15 @@ def send_monthly_report():
 @bp.route('/startups/changeGeneralInfo', methods=['POST'])
 @token_required_v2
 def change_general_info():
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return startup_controller.register_startup_controller(request)
+
+@bp.route('/startups/getUserInfo', methods=['POST'])
+@token_required_v2
+def get_user_info():
     """
     Send otp for registration of Client to given phone number
     :return: message in Response

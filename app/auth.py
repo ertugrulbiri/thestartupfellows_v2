@@ -33,11 +33,11 @@ def token_auth_error(status=401):
 
 
 def generate_jwt_token(user_id, expire_time):
-    return jwt.encode({'user_id': user_id, "exp": expire_time}, current_app.config['SECRET_KEY'], 'HS256')
+    return jwt.encode({'user_id': user_id, "exp": expire_time}, current_app.config['OPERATOR_SECRET_KEY'], 'HS256')
 
 
 def generate_refresh_token(user_id, expire_time):
-    return jwt.encode({'refresh_id': user_id, "exp": expire_time}, current_app.config['SECRET_KEY'], 'HS256')
+    return jwt.encode({'refresh_id': user_id, "exp": expire_time}, current_app.config['OPERATOR_SECRET_KEY'], 'HS256')
 
 
 ### OPERATOR ###

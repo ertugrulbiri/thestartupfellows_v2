@@ -1,9 +1,11 @@
+from flask import jsonify
 from sqlalchemy import or_
 
 from app import db
 from app.decorator import startup_decorator
 from app.errors import bad_request
 from app.model.user_models import StartupCompany, User, StartupUser
+from app.service import startup_service
 from static import constants
 
 
@@ -51,3 +53,17 @@ def register_startup_controller(request):
     db.session.commit()
 
     return 'Success'
+
+
+def get_info_of_start_up_controller(user, request):
+    user = user.get_start_up()
+    data = request.get_json()
+    if 'startup_id' not in data:
+        return bad_request("Missing required field: startup_id")
+
+    start_up = startup_service.get_info_of_start_up_service(data['startup_id'])
+    if start_up:
+        return jsonify(start_up.to_dict())
+    return bad_request("Start Up Not Found")
+
+

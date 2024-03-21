@@ -4,6 +4,7 @@ import logging
 import os
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import redis
+import app.db
 # from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 # from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask

@@ -21,6 +21,7 @@ def token_required_v2(f):
             # decode the token to obtain user public_id
             data = jwt.decode(token, current_app.config['OPERATOR_SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query.filter_by(id=data['user_id']).first()
+
             if not current_user:
                 response = make_response("Auth Error", 401)
                 response.set_cookie('user-session', '', expires=0)

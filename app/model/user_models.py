@@ -25,6 +25,7 @@ class User(UserMixin, db.Model):
     # This field determines the type of user: Client, StartupUser, Investor, etc.
     type = db.Column(db.String(50))
 
+
     # Relationships
     # Define relationships to different user types
     startup_user = db.relationship('StartupUser', back_populates='user', uselist=False)
@@ -45,6 +46,9 @@ class User(UserMixin, db.Model):
             current_app.config['SECRET_KEY'],
             algorithm='HS256').decode('utf-8')
 
+    def get_start_up(self):
+        # returns the Client object if it exists
+        return self.startup_user
     # def generate_password_hash(self, password):
     #     self.password_hash = generate_password_hash(password)
 
@@ -176,6 +180,7 @@ class StartupCompany(db.Model):
     pitch_deck_url = db.Column(db.String(500))
 
     monthly_reports = db.relationship('MonthlyReport', back_populates='startup_company', cascade="all, delete-orphan")
+    program_applications = db.relationship('ProgramApplication', back_populates='startup_company', cascade="all, delete-orphan")
     # Relationship
     startup_users = db.relationship('StartupUser', backref='startup_company')
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -306,3 +311,15 @@ class PartnerCompanyTagAssociation(db.Model):
     partner_company_tag = db.relationship('PartnerCompanyTag', backref=db.backref("company_associations"))
 
     created_at = db.Column(db.DateTime, default=datetime.now)
+
+
+class ProgramApplication(db.Model):
+    __tablename__ = 'program_applications'
+    id = db.Column(db.Integer, primary_key=True)
+    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id'))
+    created_at = db.Column(db.DateTime, default=datetime.now)  # Stores the month and year of the report
+    program_name = db.Column(db.String(120))
+    status = db.Column(db.String(120))
+    # Relationship back to the StartupCompany
+    startup_company = db.relationship('StartupCompany', back_populates='program_applications')
+
