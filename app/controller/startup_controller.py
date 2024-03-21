@@ -61,17 +61,18 @@ def register_startup_controller(request):
     expire_time = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=300)
     token = generate_jwt_token(user.id, expire_time)
     result = {'id': user.id, 'token': token}
+    print(result)
     if result:
         print("Onboard Succesfull")
         response = make_response("success")
         # response.headers['Access-Control-Allow-Credentials'] = "true"
 
         if os.environ.get('APP_MODE') == 'prod' or os.environ.get('APP_MODE') == 'prep':
-            response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=True)
+            response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=False)
         else:
             response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=False)
         return response
-
+    return bad_request(f"Register Failed")
 
 
 def get_info_of_start_up_controller(user, request):
