@@ -1,6 +1,8 @@
 from flask import jsonify
 
+from app import db
 from app.errors import bad_request
+from app.model.user_models import StartupCompany
 
 
 def get_current_client_controller(user):
@@ -14,3 +16,10 @@ def get_current_client_controller(user):
     if user:
         return jsonify(user.to_dict())
     return bad_request("User Type Not Found")
+
+
+def get_all_startups_controller(user):
+    startups = db.session.query(StartupCompany).all()
+    startup_list = [startup.to_dict() for startup in startups]
+
+    return startup_list

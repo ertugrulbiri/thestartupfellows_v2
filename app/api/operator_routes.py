@@ -12,3 +12,13 @@ def get_current_client(user):
     :return: message in Response
     """
     return operator_controller.get_current_client_controller(user)
+
+
+@bp.route('/getAllStartUps', methods=['GET'])
+@token_required_v2
+def get_all_startups(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return operator_controller.get_all_startups_controller(user)
