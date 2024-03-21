@@ -20,6 +20,11 @@ def register_startup_controller(request):
             print(f"{field} not found in user_data")
             return bad_request(f"Missing required field: {field}")
 
+    for field in user_data:
+        if not user_data[field]:
+            print(f"{field} cannot be empty")
+            return bad_request(f"Value for field {field} cannot be empty")
+
     # for field in constants.START_UP_COMPANY_MUST_FIELDS:
     #     if field not in startup_data:
     #         return bad_request(f"Missing required field: {field}")
