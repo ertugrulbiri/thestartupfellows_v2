@@ -1,10 +1,12 @@
 import datetime
+import os
 
 from dateutil.relativedelta import relativedelta
-from flask import jsonify
+from flask import jsonify, make_response
 from sqlalchemy import or_
 
 from app import db
+from app.auth import generate_jwt_token
 from app.decorator import startup_decorator
 from app.errors import bad_request
 from app.model.user_models import StartupCompany, User, StartupUser, MonthlyReport, KPI
@@ -54,7 +56,22 @@ def register_startup_controller(request):
     db.session.add(user)
     db.session.commit()
 
-    return 'Success'
+    #startup_service.send_welcome_email(user)
+
+    expire_time = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=300)
+    token = generate_jwt_token(user.id, expire_time)
+    result = {'id': user.id, 'token': token}
+    if result:
+        print("Onboard Succesfull")
+        response = make_response("success")
+        # response.headers['Access-Control-Allow-Credentials'] = "true"
+
+        if os.environ.get('APP_MODE') == 'prod' or os.environ.get('APP_MODE') == 'prep':
+            response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=True)
+        else:
+            response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=False)
+        return response
+
 
 
 def get_info_of_start_up_controller(user, request):
