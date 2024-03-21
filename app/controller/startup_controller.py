@@ -16,7 +16,7 @@ def register_startup_controller(request):
     startup_company.from_dict(startup_data)
 
     for field in constants.START_UP_USER_MUST_FIELDS:
-        if field not in user_data:
+        if field not in user_data and not user_data['password']:
             return bad_request(f"Missing required field: {field}")
 
     # for field in constants.START_UP_COMPANY_MUST_FIELDS:
