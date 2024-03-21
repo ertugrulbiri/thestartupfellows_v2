@@ -253,6 +253,7 @@ class MonthlyReport(db.Model):
 
     def to_dict(self):
         data = {
+            'created_at': self.created_at,
             'startup_company_id': self.startup_company_id,
             'kpis': [kpi.to_dict() for kpi in self.kpis]
         }
@@ -291,18 +292,13 @@ class PartnerUser(User):
     __tablename__ = 'partner_users'
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
     user = db.relationship('User', back_populates='partner_user')
-    partner_company_id = db.Column(db.Integer, db.ForeignKey('partner_companies.id'))
+    name = db.Column(db.String(150), nullable=False)
+    surname = db.Column(db.String(150), nullable=False)
+    profession = db.Column(db.String(500))
 
-    telephone = db.Column(db.String(120), index=True, unique=True)
-    age = db.Column(db.Integer)
-    gender = db.Column(db.String(50))
-    birthday = db.Column(db.DateTime)
+    partner_company_id = db.Column(db.Integer, db.ForeignKey('partner_companies.id', ondelete="CASACDE"))
 
-    education = db.Column(db.String(200))
-    address = db.Column(db.String(120))
-    city = db.Column(db.String(120))
-    country = db.Column(db.String(120))
-    role = db.Column(db.String(50))
+    type = db.Column(db.String(100))
 
 
 class PartnerCompany(db.Model):
@@ -323,9 +319,7 @@ class PartnerCompanyTag(db.Model):
     __tablename__ = 'partner_company_tags'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), index=True, unique=True)
-
     # Relationship
-
     created_at = db.Column(db.DateTime, default=datetime.now)
     # Add other fields specific to StartupCompany here
 

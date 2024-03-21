@@ -125,7 +125,8 @@ def get_start_up_reports_by_start_up_id_controller(user, request):
     data = request.get_json()
     if "startup_id" not in data:
         return bad_request("Missing startup_id field")
-    reports = MonthlyReport.query.filter_by(startup_company_id=data["startup_id"]).all()
+    reports = MonthlyReport.query.filter_by(startup_company_id=data["startup_id"]).order_by(
+        MonthlyReport.created_at.desc()).all()
     return jsonify([report.to_dict() for report in reports])
 
 
@@ -175,3 +176,26 @@ def compare_two_reports_of_start_up_controller(user, request):
         start_date: report1.to_dict() if report1 else None,
         end_date: report2.to_dict() if report2 else None
     })
+
+
+def get_kpi_data_controller(user, request):
+    data = request.get_json()
+    if 'startup_id' not in data or "kpi_name" not in data:
+        return bad_request('startup_id and kpi_name not in data')
+
+    startup_id = int(data['startup_id'])
+    kpi_name = data['kpi_name']
+
+    monthly_reports = db.session.query(MonthlyReport).filter_by(startup_company_id=startup_id).order_by(
+        MonthlyReport.created_at).all()
+
+    kpi_data = []
+    for report in monthly_reports:
+        kpi_data.extend(db.session.query(KPI).filter_by(monthly_report_id=report.id, name=kpi_name).all())
+
+    formatted_data = {
+        "x": [kpi.monthly_report.created_at.strftime('%Y-%m') for kpi in kpi_data],
+        "y": [kpi.kpi_value for kpi in kpi_data]
+    }
+
+    return jsonify(formatted_data)

@@ -22,3 +22,13 @@ def get_all_startups(user):
     :return: message in Response
     """
     return operator_controller.get_all_startups_controller(user)
+
+
+@bp.route('/addPartner', methods=['POST'])
+@token_required_v2
+def add_partner(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return operator_controller.add_partner_controller(user, request)

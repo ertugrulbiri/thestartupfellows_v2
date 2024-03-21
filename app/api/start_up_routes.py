@@ -119,3 +119,13 @@ def compare_two_reports_of_start_up(user):
     :return: message in Response
     """
     return startup_controller.compare_two_reports_of_start_up_controller(user, request)
+
+
+@bp.route('/startups/getKpiData', methods=['POST'])
+@token_required_v2
+def get_kpi_data(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return startup_controller.get_kpi_data_controller(user, request)

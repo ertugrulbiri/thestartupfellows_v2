@@ -23,3 +23,9 @@ def get_all_startups_controller(user):
     startup_list = [startup.to_dict() for startup in startups]
 
     return startup_list
+
+
+def add_partner_controller(user, request):
+    data = request.get_json()
+
+    return None
