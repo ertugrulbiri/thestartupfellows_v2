@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     startup_user = db.relationship('StartupUser', back_populates='user', uselist=False)
     partner_user = db.relationship('PartnerUser', back_populates='user', uselist=False)
     admin_user = db.relationship('AdminUser', back_populates='user', uselist=False)
+
     # Add other relationships here as needed
 
     def set_password(self, password):
@@ -46,6 +47,7 @@ class User(UserMixin, db.Model):
 
     # def generate_password_hash(self, password):
     #     self.password_hash = generate_password_hash(password)
+
 
 class StartupUser(User):
     __tablename__ = 'startup_users'
@@ -76,9 +78,17 @@ class StartupUser(User):
     linkedin_url = db.Column(db.String(300))
 
     reference = db.Column(db.String(300))
+
+    # Consent
     is_consent_given = db.Column(db.Boolean, default=False)
+    are_terms_accepted = db.Column(db.Boolean, default=False)
+    is_agreed_to_rules = db.Column(db.Boolean, default=False)
 
     # Add other fields specific to StartupUser here
+
+    # Language
+    english_test = db.Column(db.String(480))
+    english_proficiency_lvl = db.Column(db.String(300))
 
     def to_dict(self):
         data = {
@@ -101,7 +111,12 @@ class StartupUser(User):
             'linkedin_url': self.linkedin_url,
             'reference': self.reference,
             'country': self.country,
+            'english_test': self.english_test,
+            'english_proficiency_lvl': self.english_proficiency_lvl,
             'role': self.role,
+            "is_consent_given": self.is_consent_given,
+            'are_terms_accepted': self.are_terms_accepted,
+            'is_agreed_to_rules': self.is_agreed_to_rules,
             'startUpCompanyId': self.startup_company_id}
         return data
 
@@ -109,8 +124,9 @@ class StartupUser(User):
 
         for field in ['email', 'name', 'surname', 'telephone', 'university_name', 'reason_to_fs',
                       'gender', 'age', 'birthday', 'city', 'country', 'role', 'startUpCompanyId',
-                      'student_level', 'major', 'linkedin_url', 'address',
-                      'uni_start_date', 'uni_end_date', 'motivation_letter', 'reference']:
+                      'student_level', 'major', 'linkedin_url', 'address', 'english_test', 'english_proficiency_lvl',
+                      'are_terms_accepted',
+                      'is_agreed_to_rules', 'uni_start_date', 'uni_end_date', 'motivation_letter', 'reference']:
             if field in data:
                 if field in ['uni_start_date', 'uni_end_date', 'birthday']:
                     setattr(self, field, datetime.strptime(data[field], "%d-%m-%Y") if data[field] else None)
@@ -215,7 +231,6 @@ class MonthlyReport(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id'))
     created_at = db.Column(db.DateTime, default=datetime.now)  # Stores the month and year of the report
-
 
     # Relationship back to the StartupCompany
     startup_company = db.relationship('StartupCompany', back_populates='monthly_reports')
