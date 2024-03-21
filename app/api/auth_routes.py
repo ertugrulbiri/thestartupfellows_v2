@@ -13,7 +13,7 @@ from app.service import user_service
 
 @bp.route('/logout', methods=['POST'])
 @token_required_v2
-def logout():
+def logout(user):
     """
     Logout deletes user token
     ALL user sessions in other devices are logged out

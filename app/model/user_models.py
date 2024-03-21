@@ -215,7 +215,8 @@ class StartupCompany(db.Model):
             'pitch_deck_url': self.pitch_deck_url,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'startup_users': [startup_user.to_dict() for startup_user in self.startup_users]
+            'startup_users': [startup_user.to_dict() for startup_user in self.startup_users],
+            'start_up_reports': [monthly_reports.to_dict() for monthly_reports in self.monthly_reports]
         }
 
     def from_dict(self, data):
@@ -247,22 +248,45 @@ class MonthlyReport(db.Model):
     startup_company = db.relationship('StartupCompany', back_populates='monthly_reports')
 
     # Relationship to KPIs
-    kpis = db.relationship('KPI', back_populates='monthly_report', cascade="all, delete-orphan")
+    # I want to delete all kpis when delete report
+
+    kpis = db.relationship('KPI', back_populates='monthly_report', cascade="all, delete")
+
+    def to_dict(self):
+        data = {
+            'startup_company_id': self.startup_company_id,
+            'kpis': [kpi.to_dict() for kpi in self.kpis]
+        }
+        return data
 
 
 class KPI(db.Model):
     __tablename__ = 'kpis'
     id = db.Column(db.Integer, primary_key=True)
-    monthly_report_id = db.Column(db.Integer, db.ForeignKey('monthly_reports.id'))
+    monthly_report_id = db.Column(db.Integer, db.ForeignKey('monthly_reports.id', ondelete='CASCADE'))
     name = db.Column(db.String(120))  # The name of the KPI, e.g., "Revenue Growth"
-    value = db.Column(
-        db.String(120))  # The value of the KPI, could be a numeric value stored as a string for flexibility
+    kpi_value = db.Column(
+        db.Integer)  # The value of the KPI, could be a numeric value stored as a string for flexibility
     north_star_metric = db.Column(db.Boolean, default=False)  # Indicates if this KPI is the North Star Metric
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     # Relationship back to the MonthlyReport
-    monthly_report = db.relationship('MonthlyReport', back_populates='kpis')
+    monthly_report = db.relationship('MonthlyReport', back_populates='kpis', cascade="all")
 
+    def to_dict(self):
+        data = {
+            'id':self.id,
+            'monthly_report_id': self.monthly_report_id,
+            'name': self.name,
+            'kpi_value': self.kpi_value,
+            'north_star_metric': self.north_star_metric,
+            "created_at": self.created_at
+        }
+        return data
+    def from_dict(self, data):
+        for field in ['monthly_report_id', 'name', 'kpi_value', 'north_star_metric']:
+            if field in data:
+                setattr(self, field, data[field])
 
 class PartnerUser(User):
     __tablename__ = 'partner_users'

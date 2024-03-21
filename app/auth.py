@@ -50,7 +50,7 @@ def generate_operator_refresh_token(user_id, expire_time):
 
 
 def logout():
-    response = make_response("Auth Error", 401)
+    response = make_response("Logout Successful", 200)
     response.set_cookie('user-session', '', expires=0)
     return response
 

@@ -60,7 +60,7 @@ def send_monthly_report(user):
     Send otp for registration of Client to given phone number
     :return: message in Response
     """
-    return startup_controller.register_startup_controller(user, request)
+    return startup_controller.send_monthly_controller(user, request)
 
 
 @bp.route('/startups/changeGeneralInfo', methods=['POST'])
@@ -81,11 +81,41 @@ def get_user_info():
     """
     return startup_controller.register_startup_controller(request)
 
-# @bp.route('/startups/sendReport', methods=['POST'])
+#
+# @bp.route('/startups/getDashboard', methods=['POST'])
 # @token_required_v2
-# def send_monthly_report(user):
+# def get_dash_board():
 #     """
 #     Send otp for registration of Client to given phone number
 #     :return: message in Response
 #     """
-#     return startup_controller.send_monthly_report(user, request)
+#     return startup_controller.register_startup_controller(request)
+
+
+@bp.route('/startups/getReports', methods=['POST'])
+@token_required_v2
+def get_start_up_reports_by_start_up_id(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return startup_controller.get_start_up_reports_by_start_up_id_controller(user, request)
+
+@bp.route('/startups/getReportById', methods=['POST'])
+@token_required_v2
+def get_startup_report_by_report_id(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return startup_controller.get_startup_report_by_report_id_controller(user, request)
+
+
+@bp.route('/startups/compareReports', methods=['POST'])
+@token_required_v2
+def compare_two_reports_of_start_up(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return startup_controller.compare_two_reports_of_start_up_controller(user, request)
