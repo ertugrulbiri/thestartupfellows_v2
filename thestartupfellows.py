@@ -25,6 +25,6 @@ def handle_exception(e):
     #                                f"'{type(e).__name__}: {e}'")
     return 'InternalServer Error', 500
 
-@app.errorhandler(404)
-def not_found(e):
-    return 404
+# @app.errorhandler(404)
+# def not_found(e):
+#     return 404
