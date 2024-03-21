@@ -55,12 +55,12 @@ def set_meeting():
 
 @bp.route('/startups/sendMonthlyReport', methods=['POST'])
 @token_required_v2
-def send_monthly_report():
+def send_monthly_report(user):
     """
     Send otp for registration of Client to given phone number
     :return: message in Response
     """
-    return startup_controller.register_startup_controller(request)
+    return startup_controller.register_startup_controller(user, request)
 
 
 @bp.route('/startups/changeGeneralInfo', methods=['POST'])
@@ -83,9 +83,9 @@ def get_user_info():
 
 # @bp.route('/startups/sendReport', methods=['POST'])
 # @token_required_v2
-# def get_user_info():
+# def send_monthly_report(user):
 #     """
 #     Send otp for registration of Client to given phone number
 #     :return: message in Response
 #     """
-#     return startup_controller.register_startup_controller(request)
+#     return startup_controller.send_monthly_report(user, request)
