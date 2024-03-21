@@ -63,7 +63,7 @@ class StartupUser(User):
     __tablename__ = 'startup_users'
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
     user = db.relationship('User', back_populates='startup_user')
-    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id'))
+    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id', ondelete="CASCADE"))
 
     name = db.Column(db.String(240))
     surname = db.Column(db.String(240))
@@ -150,7 +150,6 @@ class AdminUser(User):
     __tablename__ = 'admin_users'
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
     user = db.relationship('User', back_populates='admin_user')
-    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id'))
 
     telephone = db.Column(db.String(120), index=True, unique=True)
     gender = db.Column(db.String(50))
@@ -241,7 +240,7 @@ class StartupCompany(db.Model):
 class MonthlyReport(db.Model):
     __tablename__ = 'monthly_reports'
     id = db.Column(db.Integer, primary_key=True)
-    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id'))
+    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)  # Stores the month and year of the report
 
     # Relationship back to the StartupCompany
@@ -346,7 +345,7 @@ class PartnerCompanyTagAssociation(db.Model):
 class ProgramApplication(db.Model):
     __tablename__ = 'program_applications'
     id = db.Column(db.Integer, primary_key=True)
-    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id'))
+    startup_company_id = db.Column(db.Integer, db.ForeignKey('startup_companies.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)  # Stores the month and year of the report
     program_name = db.Column(db.String(120))
     status = db.Column(db.String(120))
