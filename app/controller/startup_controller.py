@@ -56,7 +56,7 @@ def register_startup_controller(request):
 
 
 def get_info_of_start_up_controller(user, request):
-    user = user.get_start_up()
+    # user = user.get_start_up()
     data = request.get_json()
     if 'startup_id' not in data:
         return bad_request("Missing required field: startup_id")
@@ -67,3 +67,5 @@ def get_info_of_start_up_controller(user, request):
     return bad_request("Start Up Not Found")
 
 
+def apply_program_controller(request):
+    return None

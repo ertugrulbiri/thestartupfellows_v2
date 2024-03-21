@@ -31,7 +31,7 @@ def apply_startup_program():
     Send otp for registration of Client to given phone number
     :return: message in Response
     """
-    return startup_controller.register_startup_controller(request)
+    return startup_controller.apply_program_controller(request)
 
 
 @bp.route('/startups/getAllMentors', methods=['POST'])
@@ -80,3 +80,12 @@ def get_user_info():
     :return: message in Response
     """
     return startup_controller.register_startup_controller(request)
+
+# @bp.route('/startups/sendReport', methods=['POST'])
+# @token_required_v2
+# def get_user_info():
+#     """
+#     Send otp for registration of Client to given phone number
+#     :return: message in Response
+#     """
+#     return startup_controller.register_startup_controller(request)

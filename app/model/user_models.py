@@ -37,6 +37,7 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
@@ -49,8 +50,13 @@ class User(UserMixin, db.Model):
     def get_start_up(self):
         # returns the Client object if it exists
         return self.startup_user
-    # def generate_password_hash(self, password):
-    #     self.password_hash = generate_password_hash(password)
+    def get_partner(self):
+        # returns the Client object if it exists
+        return self.partner_user
+    def get_admin(self):
+        # returns the Client object if it exists
+        return self.admin_user
+
 
 
 class StartupUser(User):
