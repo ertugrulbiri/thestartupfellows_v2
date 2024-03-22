@@ -37,7 +37,7 @@ def set_meeting_controller(user, request):
     user_list = data.get('user_list')
     start_date_str = data.get('start_date')
     purpose = data.get('purpose')
-    slot_id = data.get('slot_id')
+    slot_id = data.get('slot_id') or 0
 
     # Parse the start_date string into a datetime object
     start_date = datetime.strptime(start_date_str, '%d-%m-%Y %H:%M:%S')
@@ -52,7 +52,7 @@ def set_meeting_controller(user, request):
         user = User.query.get(user_id)
         if user:
             # Check for an existing slot that matches the meeting time
-            slot = Slot.query.filter_by(user_id=user.id, slot_id=slot_id).first()
+            slot = Slot.query.filter_by(user_id=user.id, id=slot_id).first()
             if slot and not slot.is_booked:
                 slot.is_booked = True
             meeting.attendees.append(user)
@@ -150,6 +150,27 @@ def add_meeting_slot_controller(user, request):
 
 
 def get_all_partners_controller(user):
-    partners = db.session.query(PartnerUser).all()
-    partner_list = [partner.to_dict() for partner in partners]
-    return jsonify(partner_list)
+    # Query all PartnerUsers
+    partners = PartnerUser.query.all()
+    partners_with_slots = []
+
+    for partner in partners:
+        # For each partner, construct a dictionary including their details and slots
+        partner_data = partner.to_dict()  # Assuming PartnerUser has a to_dict method similar to the ones you've defined
+        partner_slots = []
+
+        # Retrieve and add slot information for each partner
+        for slot in partner.slots:
+            slot_data = {
+                'slot_id': slot.id,
+                'start_time': slot.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'end_time': slot.end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'is_booked': slot.is_booked
+            }
+            partner_slots.append(slot_data)
+
+        # Add slot information to the partner data
+        partner_data['slots'] = partner_slots
+        partners_with_slots.append(partner_data)
+
+    return partners_with_slots

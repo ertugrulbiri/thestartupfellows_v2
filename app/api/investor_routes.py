@@ -62,11 +62,13 @@ def create_dummy_users():
 
     print("Dummy users created successfully.")
 
+    return 'Done'
 
 from random import randint
 from datetime import datetime, timedelta
 
 
+@bp.route('/setup/generateRandomSlots', methods=['GET'])
 def create_random_slots_for_partners(n_slots=5):
     # Retrieve all PartnerUsers (Mentors and Investors)
     partner_users = PartnerUser.query.filter(PartnerUser.type.in_(['Mentor', 'Investor'])).all()
@@ -90,3 +92,4 @@ def create_random_slots_for_partners(n_slots=5):
     db.session.commit()
 
     print(f"Random slots created successfully for {len(partner_users)} partner users.")
+    return 'Done'
