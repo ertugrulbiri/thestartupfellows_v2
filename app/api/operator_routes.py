@@ -101,7 +101,7 @@ def add_meeting_note(user):
     """
     return operator_controller.add_note_to_meeting(user, request)
 
-@bp.route('/partners/addMeetingSlot', methods=['GET'])
+@bp.route('/partners/addMeetingSlot', methods=['POST'])
 @token_required_v2
 def add_meeting_slot(user):
     """
