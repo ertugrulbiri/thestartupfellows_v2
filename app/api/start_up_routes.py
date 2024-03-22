@@ -43,15 +43,6 @@ def get_all_mentors():
     """
     return startup_controller.register_startup_controller(request)
 
-@bp.route('/startups/setMeeting', methods=['POST'])
-@token_required_v2
-def set_meeting():
-    """
-    Send otp for registration of Client to given phone number
-    :return: message in Response
-    """
-    return startup_controller.register_startup_controller(request)
-
 
 @bp.route('/startups/sendMonthlyReport', methods=['POST'])
 @token_required_v2
@@ -129,3 +120,4 @@ def get_kpi_data(user):
     :return: message in Response
     """
     return startup_controller.get_kpi_data_controller(user, request)
+

@@ -32,6 +32,15 @@ class User(UserMixin, db.Model):
     partner_user = db.relationship('PartnerUser', back_populates='user', uselist=False)
     admin_user = db.relationship('AdminUser', back_populates='user', uselist=False)
 
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'type': self.type
+        }
+
+
     # Add other relationships here as needed
 
     def set_password(self, password):
@@ -295,45 +304,47 @@ class PartnerUser(User):
     name = db.Column(db.String(150), nullable=False)
     surname = db.Column(db.String(150), nullable=False)
     profession = db.Column(db.String(500))
-
-    partner_company_id = db.Column(db.Integer, db.ForeignKey('partner_companies.id', ondelete="CASACDE"))
+    company_name = db.Column(db.String(250))
 
     type = db.Column(db.String(100))
 
 
-class PartnerCompany(db.Model):
-    __tablename__ = 'partner_companies'
+meeting_users = db.Table('meeting_users',
+    db.Column('meeting_id', db.Integer, db.ForeignKey('meetings.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
+
+note_authors = db.Table('note_authors',
+    db.Column('note_id', db.Integer, db.ForeignKey('meeting_notes.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
+
+class Meeting(db.Model):
+    __tablename__ = 'meetings'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), index=True, unique=True)
-    logo_url = db.Column(db.String(500))
-    description = db.Column(db.Text())
-    web_site_url = db.Column(db.String(500))
-    hq_country = db.Column(db.String(120))
-    # Relationship
-    partner_user = db.relationship('PartnerUser', backref='partner_company')
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    location = db.Column(db.String(255), default="MEETING URL")
+    purpose = db.Column(db.Text)
 
+    # Relationships
+    attendees = db.relationship('User', secondary=meeting_users, backref=db.backref('meetings', lazy='dynamic'))
+    notes = db.relationship('MeetingNote', backref='meeting', lazy=True)
 
-class PartnerCompanyTag(db.Model):
-    __tablename__ = 'partner_company_tags'
+    def __init__(self, **kwargs):
+        super(Meeting, self).__init__(**kwargs)
+        self.end_date = self.start_date + timedelta(minutes=45)
+
+class MeetingNote(db.Model):
+    __tablename__ = 'meeting_notes'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), index=True, unique=True)
+    meeting_id = db.Column(db.Integer, db.ForeignKey('meetings.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
     # Relationship
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    # Add other fields specific to StartupCompany here
+    authors = db.relationship('User', secondary=note_authors, backref=db.backref('authored_notes', lazy='dynamic'))
 
-
-class PartnerCompanyTagAssociation(db.Model):
-    __tablename__ = 'partner_company_tag_associations'
-    partner_company_id = db.Column(db.Integer, db.ForeignKey('partner_companies.id'), primary_key=True)
-    partner_company_tag_id = db.Column(db.Integer, db.ForeignKey('partner_company_tags.id'), primary_key=True)
-
-    # Relationship to the PartnerCompany and PartnerCompanyTag models
-    partner_company = db.relationship('PartnerCompany', backref=db.backref("tag_associations"))
-    partner_company_tag = db.relationship('PartnerCompanyTag', backref=db.backref("company_associations"))
-
-    created_at = db.Column(db.DateTime, default=datetime.now)
 
 
 class ProgramApplication(db.Model):
