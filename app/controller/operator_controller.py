@@ -4,7 +4,7 @@ from flask import jsonify
 
 from app import db
 from app.errors import bad_request
-from app.model.user_models import StartupCompany, Meeting, User, MeetingNote
+from app.model.user_models import StartupCompany, Meeting, User, MeetingNote, Slot, PartnerUser
 
 
 def get_current_client_controller(user):
@@ -37,6 +37,7 @@ def set_meeting_controller(user, request):
     user_list = data.get('user_list')
     start_date_str = data.get('start_date')
     purpose = data.get('purpose')
+    slot_id = data.get('slot_id')
 
     # Parse the start_date string into a datetime object
     start_date = datetime.strptime(start_date_str, '%d-%m-%Y %H:%M:%S')
@@ -47,18 +48,14 @@ def set_meeting_controller(user, request):
     meeting = Meeting(start_date=start_date, end_date=end_date, purpose=purpose)
     db.session.add(meeting)
 
-    # Associate the meeting with users
     for user_id in user_list:
-        # Find the user by ID
         user = User.query.get(user_id)
         if user:
-            # If the user exists, add them to the meeting's attendees
+            # Check for an existing slot that matches the meeting time
+            slot = Slot.query.filter_by(user_id=user.id, slot_id=slot_id).first()
+            if slot and not slot.is_booked:
+                slot.is_booked = True
             meeting.attendees.append(user)
-        else:
-            # Optionally handle the case where a user ID does not correspond to an actual user
-            pass  # You might want to log this or handle it according to your app's requirements
-
-    # Commit the changes to the database
     db.session.commit()
 
     # Return a success response
@@ -133,3 +130,26 @@ def add_note_to_meeting(user, request):
     db.session.commit()
 
     return jsonify({'message': 'Note added successfully', 'note_id': new_note.id}), 200
+
+
+def add_meeting_slot_controller(user, request):
+    data = request.get_json()
+    start_time_str = data.get('start_time')
+
+    # Convert start_time_str to a datetime object
+    start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
+
+    # Create the new Slot instance
+    new_slot = Slot(user_id=user.id, start_time=start_time)
+
+    # Add the new slot to the session and commit
+    db.session.add(new_slot)
+    db.session.commit()
+
+    return jsonify({'message': 'Slot created successfully', 'slot': new_slot.to_dict()}), 200
+
+
+def get_all_partners_controller(user):
+    partners = db.session.query(PartnerUser).all()
+    partner_list = [partner.to_dict() for partner in partners]
+    return jsonify(partner_list)

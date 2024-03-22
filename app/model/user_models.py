@@ -159,17 +159,53 @@ class AdminUser(User):
     __tablename__ = 'admin_users'
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
     user = db.relationship('User', back_populates='admin_user')
-
     telephone = db.Column(db.String(120), index=True, unique=True)
-    gender = db.Column(db.String(50))
+    job = db.Column(db.String(120))
+    img_url = db.Column(db.String(340))
 
-    education = db.Column(db.String(200))
-    address = db.Column(db.String(120))
-    city = db.Column(db.String(120))
-    country = db.Column(db.String(120))
-    role_on_start_up = db.Column(db.String(50))
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            'telephone': self.telephone,
+            'job': self.job,
+            'img_url': self.img_url
+        }
+        return data
+
+    def from_dict(self, data):
+        for field in ['telephone', 'job', 'img_url']:
+            if field in data:
+                setattr(self, field, data[field])
+
 
     # Add other fields specific to StartupUser here
+
+class PartnerUser(User):
+    __tablename__ = 'partner_users'
+    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    user = db.relationship('User', back_populates='partner_user')
+    name = db.Column(db.String(150), nullable=False)
+    surname = db.Column(db.String(150), nullable=False)
+    profession = db.Column(db.String(500))
+    company_name = db.Column(db.String(250))
+
+    type = db.Column(db.String(100))
+
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            'surname': self.surname,
+            'name': self.name,
+            'profession': self.profession,
+            'company_name': self.company_name,
+            "type":self.type
+        }
+        return data
+
+    def from_dict(self, data):
+        for field in ['surname', 'name', 'profession', 'company_name', 'type']:
+            if field in data:
+                setattr(self, field, data[field])
 
 
 class StartupCompany(db.Model):
@@ -297,17 +333,6 @@ class KPI(db.Model):
             if field in data:
                 setattr(self, field, data[field])
 
-class PartnerUser(User):
-    __tablename__ = 'partner_users'
-    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    user = db.relationship('User', back_populates='partner_user')
-    name = db.Column(db.String(150), nullable=False)
-    surname = db.Column(db.String(150), nullable=False)
-    profession = db.Column(db.String(500))
-    company_name = db.Column(db.String(250))
-
-    type = db.Column(db.String(100))
-
 
 meeting_users = db.Table('meeting_users',
     db.Column('meeting_id', db.Integer, db.ForeignKey('meetings.id'), primary_key=True),
@@ -357,3 +382,29 @@ class ProgramApplication(db.Model):
     # Relationship back to the StartupCompany
     startup_company = db.relationship('StartupCompany', back_populates='program_applications')
 
+
+class Slot(db.Model):
+    __tablename__ = 'slots'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
+    is_booked = db.Column(db.Boolean, default=False, nullable=False)
+
+    # Relationship back to User
+    user = db.relationship('User', backref='slots')
+
+    def __init__(self, **kwargs):
+        super(Slot, self).__init__(**kwargs)
+        # Automatically set the end_time to 45 minutes after the start_time
+        if 'start_time' in kwargs:
+            self.end_time = self.start_time + timedelta(minutes=45)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'start_time': self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'end_time': self.end_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'is_booked': self.is_booked
+        }

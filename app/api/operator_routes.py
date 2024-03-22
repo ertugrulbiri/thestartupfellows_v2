@@ -23,6 +23,15 @@ def get_all_startups(user):
     """
     return operator_controller.get_all_startups_controller(user)
 
+@bp.route('/getPartners', methods=['GET'])
+@token_required_v2
+def get_all_partners(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return operator_controller.get_all_partners_controller(user)
+
 @bp.route('/getAllUsers', methods=['GET'])
 @token_required_v2
 def get_all_users(user):
@@ -91,3 +100,12 @@ def add_meeting_note(user):
     :return: message in Response
     """
     return operator_controller.add_note_to_meeting(user, request)
+
+@bp.route('/partners/addMeetingSlot', methods=['GET'])
+@token_required_v2
+def add_meeting_slot(user):
+    """
+    Send otp for registration of Client to given phone number
+    :return: message in Response
+    """
+    return operator_controller.add_meeting_slot_controller(user, request)
