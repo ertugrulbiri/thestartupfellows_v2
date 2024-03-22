@@ -47,7 +47,7 @@ def request_login_otp():
         # response.headers['Access-Control-Allow-Credentials'] = "true"
 
         if os.environ.get('APP_MODE') == 'prod' or os.environ.get('APP_MODE') == 'prep':
-            response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=True)
+            response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=False)
         else:
             response.set_cookie('user-session', result['token'], httponly=True, samesite="None", secure=False)
         return response

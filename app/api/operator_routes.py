@@ -92,7 +92,7 @@ def get_meetings_of_client(user):
     return operator_controller.get_all_meetings_of_users(user)
 
 
-@bp.route('/addMeetingNote', methods=['GET'])
+@bp.route('/addMeetingNote', methods=['POST'])
 @token_required_v2
 def add_meeting_note(user):
     """
